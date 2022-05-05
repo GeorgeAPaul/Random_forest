@@ -6,6 +6,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"sort"
 	"strconv"
 )
 
@@ -15,7 +16,10 @@ func main() {
 	//label := open_csv_column("Reduced Features for TAI project.csv", 151)
 	data := open_csv("test.csv")
 	fmt.Println(data)
-	fmt.Print(gini_index(data, 0))
+	find_best_split(data, 0)
+	//fmt.Println(data)
+
+	//fmt.Print(gini_index(data, 0, 5.5))
 
 }
 
@@ -44,10 +48,14 @@ func open_csv(path string) (data [][]float64) {
 	return data
 }
 
-func gini_index(data [][]float64, column int) (gini_index float64) {
+func find_best_split(data [][]float64, column int) {
 
-	threshold := 5.5
-	//total := float64(len(data))
+	sort.Slice(data, func(i, j int) bool { return data[i][column] < data[j][column] })
+
+	fmt.Print(data)
+}
+
+func gini_index(data [][]float64, column int, threshold float64) (gini_index float64) {
 
 	var rows_above [][]float64
 	var rows_below [][]float64
