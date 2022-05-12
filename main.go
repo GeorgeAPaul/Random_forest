@@ -5,21 +5,25 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"os"
 	"sort"
 	"strconv"
+	"time"
 )
 
 func main() {
-	fmt.Println("The project begins...")
-	data := open_csv("test.csv")
-	fmt.Println(data)
+	//data := open_csv("test.csv")
+	data := open_csv("Reduced Features for TAI project.csv")
+	//fmt.Println(data)
 
 	//fmt.Print(gini_index(data, 0, 5.5))
 
-	gini, split := find_best_split(data, 0)
-	fmt.Println(gini)
-	fmt.Println(split)
+	//gini, split := find_best_split(data, 0)
+	//fmt.Println(gini)
+	//fmt.Println(split)
+
+	create_decision_tree(data)
 
 }
 
@@ -46,6 +50,24 @@ func open_csv(path string) (data [][]float64) {
 		}
 	}
 	return data
+}
+
+func create_decision_tree(data [][]float64) {
+
+	var column_index []int
+
+	for i := 0; i < len(data[0])-1; i++ {
+
+		column_index = append(column_index, i)
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(column_index), func(i, j int) { column_index[i], column_index[j] = column_index[j], column_index[i] })
+
+	for _, column := range column_index {
+		fmt.Println(column)
+		fmt.Println(find_best_split(data, column))
+	}
 }
 
 func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64) {
