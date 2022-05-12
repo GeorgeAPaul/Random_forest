@@ -52,6 +52,8 @@ func open_csv(path string) (data [][]float64) {
 	return data
 }
 
+//func plant_random_forest
+
 func create_decision_tree(data [][]float64) (tree [][]float64) {
 
 	var column_index []int
