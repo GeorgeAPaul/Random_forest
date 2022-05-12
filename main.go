@@ -13,8 +13,8 @@ import (
 )
 
 func main() {
-	//data := open_csv("test.csv")
-	data := open_csv("Reduced Features for TAI project.csv")
+	data := open_csv("test.csv")
+	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
 	//fmt.Print(gini_index(data, 0, 5.5))
@@ -23,7 +23,7 @@ func main() {
 	//fmt.Println(gini)
 	//fmt.Println(split)
 
-	create_decision_tree(data)
+	fmt.Println(create_decision_tree(data))
 
 }
 
@@ -52,7 +52,7 @@ func open_csv(path string) (data [][]float64) {
 	return data
 }
 
-func create_decision_tree(data [][]float64) {
+func create_decision_tree(data [][]float64) (tree [][]float64) {
 
 	var column_index []int
 
@@ -65,9 +65,11 @@ func create_decision_tree(data [][]float64) {
 	rand.Shuffle(len(column_index), func(i, j int) { column_index[i], column_index[j] = column_index[j], column_index[i] })
 
 	for _, column := range column_index {
-		fmt.Println(column)
-		fmt.Println(find_best_split(data, column))
+		_, split := find_best_split(data, column)
+		tree = append(tree, []float64{float64(column), split})
 	}
+
+	return tree
 }
 
 func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64) {
