@@ -15,7 +15,7 @@ func main() {
 	data := open_csv("test.csv")
 	fmt.Println(data)
 
-	//fmt.Print(gini_index(data, 0, 0.25))
+	//fmt.Print(gini_index(data, 0, 5.5))
 
 	gini, split := find_best_split(data, 0)
 	fmt.Println(gini)
@@ -65,10 +65,10 @@ func find_best_split(data [][]float64, column int) (best_gini float64, best_spli
 			best_gini = gini
 			best_split = split
 		}
-		fmt.Println(lower)
-		fmt.Println(row[column])
-		fmt.Println(gini)
-		fmt.Println(best_gini)
+		//fmt.Println(lower)
+		//fmt.Println(row[column])
+		//fmt.Println(gini)
+		//fmt.Println(best_gini)
 
 		lower = row[column]
 
@@ -111,19 +111,24 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 	total_above := above_label0 + above_label1
 	total_below := below_label0 + below_label1
 
-	if total_below == 0 {
-		total_below = 1
+	//fmt.Printf("Above %v\n", rows_above)
+	//fmt.Printf("Below %v\n", rows_below)
+
+	gini_above := 0.
+	gini_below := 0.
+
+	if total_above != 0 {
+		gini_above = 1 - math.Pow(above_label0/total_above, 2) - math.Pow(above_label1/total_above, 2)
 	}
 
-	fmt.Printf("Above %v\n", rows_above)
-	fmt.Printf("Below %v\n", rows_below)
+	if total_below != 0 {
+		gini_below = 1 - math.Pow(below_label0/total_below, 2) - math.Pow(below_label1/total_below, 2)
+	}
 
-	gini_above := 1 - math.Pow(above_label0/total_above, 2) - math.Pow(above_label1/total_above, 2)
-	gini_below := 1 - math.Pow(below_label0/total_below, 2) - math.Pow(below_label1/total_below, 2)
-
-	fmt.Printf("Gini Above %v\n", gini_above)
-	fmt.Printf("Gini Below %v\n", gini_below)
+	//fmt.Printf("Gini Above %v\n", gini_above)
+	//fmt.Printf("Gini Below %v\n", gini_below)
 
 	average_gini := (gini_above + gini_below) / 2
+
 	return average_gini //gini
 }
