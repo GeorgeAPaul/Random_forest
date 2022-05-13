@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strconv"
 	"time"
+
+	"github.com/GeorgeAPaul/Random_forest/tree/master/decision_tree/dt_node"
 )
 
 func main() {
@@ -25,7 +27,7 @@ func main() {
 
 	//fmt.Println(create_decision_tree(data))
 
-	test := &BinaryNode{data: []float64{5., 5.}, left: nil, right: nil}
+	test := &dt_node.BinaryNode{Data: []float64{5., 5.}, Left: nil, Right: nil}
 
 	fmt.Println(test)
 
