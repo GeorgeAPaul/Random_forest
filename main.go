@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/GeorgeAPaul/Random_forest/decision_tree"
-	"github.com/GeorgeAPaul/Random_forest/decision_tree/dt_node"
+	"github.com/GeorgeAPaul/Random_forest/dt_node"
 )
 
 func main() {
