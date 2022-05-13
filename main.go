@@ -105,8 +105,8 @@ func find_best_split(data [][]float64, column int) (best_gini float64, best_spli
 
 func gini_index(data [][]float64, column int, threshold float64) (gini_index float64) {
 
-	var rows_above [][]float64
-	var rows_below [][]float64
+	//var rows_above [][]float64
+	//var rows_below [][]float64
 
 	above_label0 := 0.
 	below_label0 := 0.
@@ -116,7 +116,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 	for _, row := range data {
 
 		if row[column] < threshold {
-			rows_below = append(rows_below, row)
+			//rows_below = append(rows_below, row)
 
 			if row[len(row)-1] == 0 {
 				below_label0++
@@ -124,7 +124,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 				below_label1++
 			}
 		} else {
-			rows_above = append(rows_above, row)
+			//rows_above = append(rows_above, row)
 
 			if row[len(row)-1] == 0 {
 				above_label0++
