@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	data := open_csv("test.csv")
+	//data := open_csv("test.csv")
 	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
@@ -23,7 +23,11 @@ func main() {
 	//fmt.Println(gini)
 	//fmt.Println(split)
 
-	fmt.Println(create_decision_tree(data))
+	//fmt.Println(create_decision_tree(data))
+
+	test := &BinaryNode{data: []float64{5., 5.}, left: nil, right: nil}
+
+	fmt.Println(test)
 
 }
 
