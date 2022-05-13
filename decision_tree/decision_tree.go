@@ -1,7 +1,7 @@
-package Decision_tree
+package decision_tree
 
-import "github.com/GeorgeAPaul/Random_forest/Dt_node"
+import "github.com/GeorgeAPaul/Random_forest/dt_node"
 
 type BinaryTree struct {
-	Root *Dt_node.BinaryNode
+	Root *dt_node.BinaryNode
 }
