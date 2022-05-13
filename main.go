@@ -11,8 +11,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/GeorgeAPaul/Random_forest/Decision_tree"
-	"github.com/GeorgeAPaul/Random_forest/Dt_node"
+	"github.com/GeorgeAPaul/Random_forest/decision_tree"
+	"github.com/GeorgeAPaul/Random_forest/decision_tree/dt_node"
 )
 
 func main() {
@@ -28,11 +28,11 @@ func main() {
 
 	//fmt.Println(create_decision_tree(data))
 
-	testTree := &Decision_tree.BinaryTree{
+	testTree := &decision_tree.BinaryTree{
 		Root: nil,
 	}
 
-	testNode := &Dt_node.BinaryNode{
+	testNode := &dt_node.BinaryNode{
 		Data:  nil,
 		Left:  nil,
 		Right: nil}

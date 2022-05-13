@@ -1,4 +1,4 @@
-package Dt_node
+package dt_node
 
 type BinaryNode struct {
 	Left  *BinaryNode
