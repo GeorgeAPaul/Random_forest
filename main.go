@@ -28,7 +28,7 @@ func main() {
 
 	//fmt.Println(create_decision_tree(data))
 
-	testTree := &decision_tree.BinaryTree{Root: nil}
+	testTree := &decision_tree.BinaryTree{}
 	testNode := &dt_node.BinaryNode{Data: nil, Left: nil, Right: nil}
 
 	fmt.Println(testTree)
