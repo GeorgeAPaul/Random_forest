@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/GeorgeAPaul/Random_forest/tree/master/decision_tree/dt_node"
+	"github.com/GeorgeAPaul/Random_forest/decision_tree/dt_node"
 )
 
 func main() {
