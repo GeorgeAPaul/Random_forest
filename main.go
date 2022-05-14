@@ -9,7 +9,6 @@ import (
 	"os"
 	"sort"
 	"strconv"
-	"time"
 
 	"github.com/GeorgeAPaul/Random_forest/decision_tree"
 	"github.com/GeorgeAPaul/Random_forest/dt_node"
@@ -69,29 +68,29 @@ func open_csv(path string) (data [][]float64) {
 
 //func plant_random_forest
 
-func create_decision_tree(data [][]float64) (tree decision_tree.BinaryTree) {
+// func create_decision_tree(data [][]float64) (tree decision_tree.BinaryTree) {
 
-	col := 0
+// 	col := 0
 
-	tree.Root = &dt_node.BinaryNode{Data: []float64{float64(col), split}, Left: nil, Right: nil}
+// 	tree.Root = &dt_node.BinaryNode{Data: [][]float64{[]float64{float64(col), split}}, Left: nil, Right: nil}
 
-	var column_index []int
+// 	var column_index []int
 
-	for i := 0; i < len(data[0])-1; i++ {
+// 	for i := 0; i < len(data[0])-1; i++ {
 
-		column_index = append(column_index, i)
-	}
+// 		column_index = append(column_index, i)
+// 	}
 
-	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(column_index), func(i, j int) { column_index[i], column_index[j] = column_index[j], column_index[i] })
+// 	rand.Seed(time.Now().UnixNano())
+// 	rand.Shuffle(len(column_index), func(i, j int) { column_index[i], column_index[j] = column_index[j], column_index[i] })
 
-	for _, column := range column_index {
-		_, split := find_best_split(data, column)
-		tree = append(tree, []float64{float64(column), split})
-	}
+// 	for _, column := range column_index {
+// 		_, split := find_best_split(data, column)
+// 		tree = append(tree, []float64{float64(column), split})
+// 	}
 
-	return tree
-}
+// 	return tree
+// }
 
 func populate_dt_node(data [][]float64, current_depth int, max_depth int, node dt_node.BinaryNode) {
 
@@ -111,6 +110,9 @@ func populate_dt_node(data [][]float64, current_depth int, max_depth int, node d
 		_, split := find_best_split(data, column)
 
 		node.Add_nodes(column, split)
+
+		populate_dt_node(data, current_depth+1, max_depth, node.Left)
+		populate_dt_node(data, current_depth+1, max_depth, node.Right)
 
 	}
 }
