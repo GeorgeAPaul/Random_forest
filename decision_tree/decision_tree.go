@@ -7,7 +7,7 @@ import (
 )
 
 type BinaryTree struct {
-	Root *dt_node.BinaryNode
+	Root dt_node.BinaryNode
 }
 
 func (b BinaryTree) String() string {
