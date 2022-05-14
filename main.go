@@ -15,29 +15,15 @@ import (
 )
 
 func main() {
-	//data := open_csv("test.csv")
+	data := open_csv("test.csv")
 	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
-	//fmt.Print(gini_index(data, 0, 5.5))
+	tree := decision_tree.BinaryTree{Root: &dt_node.BinaryNode{Data: nil, Left: nil, Right: nil}}
 
-	//gini, split := find_best_split(data, 0)
-	//fmt.Println(gini)
-	//fmt.Println(split)
+	populate_dt_node(data, 0, 1, *tree.Root)
 
-	//fmt.Println(create_decision_tree(data))
-
-	testTree := &decision_tree.BinaryTree{
-		Root: nil,
-	}
-
-	testNode := &dt_node.BinaryNode{
-		Data:  nil,
-		Left:  nil,
-		Right: nil}
-
-	fmt.Println(testTree)
-	fmt.Println(testNode)
+	fmt.Println(tree)
 
 }
 
@@ -102,7 +88,7 @@ func populate_dt_node(data [][]float64, current_depth int, max_depth int, node d
 
 		for {
 			column = rand.Intn(len(data[0]))
-			if contains(node.Data, column) != true {
+			if !contains(node.Data, column) {
 				break
 			}
 		}
@@ -111,8 +97,8 @@ func populate_dt_node(data [][]float64, current_depth int, max_depth int, node d
 
 		node.Add_nodes(column, split)
 
-		populate_dt_node(data, current_depth+1, max_depth, node.Left)
-		populate_dt_node(data, current_depth+1, max_depth, node.Right)
+		populate_dt_node(data, current_depth+1, max_depth, *node.Left)
+		populate_dt_node(data, current_depth+1, max_depth, *node.Right)
 
 	}
 }
