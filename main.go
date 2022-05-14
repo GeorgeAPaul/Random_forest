@@ -69,7 +69,11 @@ func open_csv(path string) (data [][]float64) {
 
 //func plant_random_forest
 
-func create_decision_tree(data [][]float64) (tree [][]float64) {
+func create_decision_tree(data [][]float64) (tree decision_tree.BinaryTree) {
+
+	col := 0
+
+	tree.Root = &dt_node.BinaryNode{Data: []float64{float64(col), split}, Left: nil, Right: nil}
 
 	var column_index []int
 
@@ -87,6 +91,28 @@ func create_decision_tree(data [][]float64) (tree [][]float64) {
 	}
 
 	return tree
+}
+
+func populate_dt_node(data [][]float64, current_depth int, max_depth int, node dt_node.BinaryNode) {
+
+	if current_depth == max_depth {
+		return
+	} else {
+
+		var column int
+
+		for {
+			column = rand.Intn(len(data[0]))
+			if contains(node.Data, column) != true {
+				break
+			}
+		}
+
+		_, split := find_best_split(data, column)
+
+		node.Add_nodes(column, split)
+
+	}
 }
 
 func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64) {
@@ -172,4 +198,13 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 	average_gini := (gini_above + gini_below) / 2
 
 	return average_gini //gini
+}
+
+func contains(s [][]float64, e int) bool {
+	for _, a := range s {
+		if int(a[0]) == e {
+			return true
+		}
+	}
+	return false
 }
