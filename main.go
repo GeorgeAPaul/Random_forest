@@ -10,9 +10,6 @@ import (
 	"sort"
 	"strconv"
 	"time"
-
-	"github.com/GeorgeAPaul/Random_forest/decision_tree"
-	"github.com/GeorgeAPaul/Random_forest/dt_node"
 )
 
 func main() {
@@ -20,10 +17,10 @@ func main() {
 	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
-	root := &dt_node.BinaryNode{Data: nil, Left: nil, Right: nil}
-	tree := decision_tree.BinaryTree{Root: root}
+	root := &BinaryNode{Data: nil, Left: nil, Right: nil}
+	tree := BinaryTree{Root: root}
 
-	populate_dt_node(data, 0, 2, tree.Root)
+	populate_dt_node(data, 0, len(data)-1, tree.Root)
 
 	fmt.Printf("%+v\n", tree)
 	fmt.Printf("%+v\n", *tree.Root)
@@ -87,7 +84,7 @@ func open_csv(path string) (data [][]float64) {
 // 	return tree
 // }
 
-func populate_dt_node(data [][]float64, current_depth int, max_depth int, node *dt_node.BinaryNode) {
+func populate_dt_node(data [][]float64, current_depth int, max_depth int, node *BinaryNode) {
 
 	if current_depth == max_depth {
 		return
@@ -205,4 +202,23 @@ func contains(s [][]float64, e int) bool {
 		}
 	}
 	return false
+}
+
+type BinaryTree struct {
+	Root *BinaryNode
+}
+
+type BinaryNode struct {
+	Left  *BinaryNode
+	Right *BinaryNode
+	Data  [][]float64
+}
+
+func (n *BinaryNode) Add_nodes(col int, split float64) {
+
+	n.Data = append(n.Data, []float64{float64(col), split})
+
+	n.Left = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
+	n.Right = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
+
 }
