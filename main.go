@@ -13,14 +13,20 @@ import (
 )
 
 func main() {
-	//data := open_csv("test.csv")
-	data := open_csv("Reduced Features for TAI project.csv")
+	data := open_csv("test.csv")
+	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
-	root := &BinaryNode{Data: nil, Left: nil, Right: nil}
-	tree := BinaryTree{Root: root}
+	root := &Node{Data: nil, Left: nil, Right: nil}
+	tree := &DecisionTree{Root: root}
 
 	populate_dt_node(data, 0, tree.Root)
+
+	rand.Seed(time.Now().UnixNano())
+	test_row := 3 //rand.Intn(len(data) - 1)
+
+	fmt.Printf("Row %v\n", test_row)
+	fmt.Printf("Classified %v\n", classify(data[test_row], tree))
 
 	fmt.Printf("%+v\n", tree)
 	fmt.Printf("%+v\n", *tree.Root)
@@ -58,41 +64,44 @@ func open_csv(path string) (data [][]float64) {
 	return data
 }
 
-//func plant_random_forest
+func classify(row []float64, decision_tree *DecisionTree) int {
 
-// func create_decision_tree(data [][]float64) (tree decision_tree.BinaryTree) {
+	fmt.Printf("Row %v\n", row)
 
-// 	col := 0
+	node := decision_tree.Root
 
-// 	tree.Root = &dt_node.BinaryNode{Data: [][]float64{[]float64{float64(col), split}}, Left: nil, Right: nil}
+	for i := 0; i < 3; i++ {
 
-// 	var column_index []int
+		column := node.Data[i][0]
+		split := node.Data[i][1]
 
-// 	for i := 0; i < len(data[0])-1; i++ {
+		if row[int(column)] > split {
+			node = node.Right
+			fmt.Println("Right")
+			if node == nil {
+				return 1
+			}
+		} else {
+			node = node.Left
+			fmt.Println("Left")
+			if node == nil {
+				return 0
+			}
+		}
+	}
 
-// 		column_index = append(column_index, i)
-// 	}
+	return 99
+}
 
-// 	rand.Seed(time.Now().UnixNano())
-// 	rand.Shuffle(len(column_index), func(i, j int) { column_index[i], column_index[j] = column_index[j], column_index[i] })
+func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 
-// 	for _, column := range column_index {
-// 		_, split := find_best_split(data, column)
-// 		tree = append(tree, []float64{float64(column), split})
-// 	}
-
-// 	return tree
-// }
-
-func populate_dt_node(data [][]float64, current_depth int, node *BinaryNode) {
-
-	max_depth := 10 //len(data[0]) - 1
+	max_depth := len(data[0]) - 1
 
 	//fmt.Println(max_depth)
 
-	if current_depth%1 == 0 {
-		fmt.Println(current_depth)
-	}
+	//if current_depth%1 == 0 {
+	fmt.Println(current_depth)
+	//}
 
 	if current_depth == max_depth {
 		return
@@ -212,21 +221,21 @@ func contains(s [][]float64, e int) bool {
 	return false
 }
 
-type BinaryTree struct {
-	Root *BinaryNode
+type DecisionTree struct {
+	Root *Node
 }
 
-type BinaryNode struct {
-	Left  *BinaryNode
-	Right *BinaryNode
+type Node struct {
+	Left  *Node
+	Right *Node
 	Data  [][]float64
 }
 
-func (n *BinaryNode) Add_nodes(col int, split float64) {
+func (n *Node) Add_nodes(col int, split float64) {
 
 	n.Data = append(n.Data, []float64{float64(col), split})
 
-	n.Left = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
-	n.Right = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
+	n.Left = &Node{Data: n.Data, Left: nil, Right: nil}
+	n.Right = &Node{Data: n.Data, Left: nil, Right: nil}
 
 }
