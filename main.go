@@ -9,6 +9,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"time"
 
 	"github.com/GeorgeAPaul/Random_forest/decision_tree"
 	"github.com/GeorgeAPaul/Random_forest/dt_node"
@@ -19,11 +20,19 @@ func main() {
 	//data := open_csv("Reduced Features for TAI project.csv")
 	//fmt.Println(data)
 
-	tree := decision_tree.BinaryTree{Root: &dt_node.BinaryNode{Data: nil, Left: nil, Right: nil}}
+	root := &dt_node.BinaryNode{Data: nil, Left: nil, Right: nil}
+	tree := decision_tree.BinaryTree{Root: root}
 
-	populate_dt_node(data, 0, 1, *tree.Root)
+	populate_dt_node(data, 0, 2, tree.Root)
 
-	fmt.Println(tree)
+	fmt.Printf("%+v\n", tree)
+	fmt.Printf("%+v\n", *tree.Root)
+	fmt.Printf("%+v\n", *tree.Root.Left)
+	fmt.Printf("%+v\n", *tree.Root.Right)
+	fmt.Printf("%+v\n", *tree.Root.Left.Left)
+	fmt.Printf("%+v\n", *tree.Root.Left.Right)
+	fmt.Printf("%+v\n", *tree.Root.Right.Right)
+	fmt.Printf("%+v\n", *tree.Root.Right.Left)
 
 }
 
@@ -78,7 +87,7 @@ func open_csv(path string) (data [][]float64) {
 // 	return tree
 // }
 
-func populate_dt_node(data [][]float64, current_depth int, max_depth int, node dt_node.BinaryNode) {
+func populate_dt_node(data [][]float64, current_depth int, max_depth int, node *dt_node.BinaryNode) {
 
 	if current_depth == max_depth {
 		return
@@ -87,7 +96,8 @@ func populate_dt_node(data [][]float64, current_depth int, max_depth int, node d
 		var column int
 
 		for {
-			column = rand.Intn(len(data[0]))
+			rand.Seed(time.Now().UnixNano())
+			column = rand.Intn(len(data[0]) - 1)
 			if !contains(node.Data, column) {
 				break
 			}
@@ -97,8 +107,8 @@ func populate_dt_node(data [][]float64, current_depth int, max_depth int, node d
 
 		node.Add_nodes(column, split)
 
-		populate_dt_node(data, current_depth+1, max_depth, *node.Left)
-		populate_dt_node(data, current_depth+1, max_depth, *node.Right)
+		populate_dt_node(data, current_depth+1, max_depth, node.Left)
+		populate_dt_node(data, current_depth+1, max_depth, node.Right)
 
 	}
 }

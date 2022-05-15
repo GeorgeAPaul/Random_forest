@@ -8,7 +8,9 @@ type BinaryNode struct {
 
 func (n *BinaryNode) Add_nodes(col int, split float64) {
 
-	n.Left = &BinaryNode{Data: append(n.Data, []float64{float64(col), split, 0.}), Left: nil, Right: nil}
-	n.Right = &BinaryNode{Data: append(n.Data, []float64{float64(col), split, 1.}), Left: nil, Right: nil}
+	n.Data = append(n.Data, []float64{float64(col), split})
+
+	n.Left = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
+	n.Right = &BinaryNode{Data: n.Data, Left: nil, Right: nil}
 
 }
