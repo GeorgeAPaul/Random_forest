@@ -1,12 +1,4 @@
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220513150748-bae463644f73 h1:yvi4NuigSxYNroRQmXKXjQ2Aqfy3V0YLGRyMwBgmftc=
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220513150748-bae463644f73/go.mod h1:plVkrAP+7YsnoBdbtewNsfmHGRj0rhd14cTbeZNrGWc=
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514154853-f93f4ab4ad34 h1:xwfoBE5JS9VJGyiMhrh502IS6wjnYEt6FmtGruZ0n4M=
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514154853-f93f4ab4ad34/go.mod h1:d3QCEBwpiQltRUCCUsi632CuNjFdm5yP8H3r/AHDb+w=
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514164345-adda7fe5589d h1:2bS6sS7VCPnBXO4k2xThVpSTnzBItbSy8Lc/29m0ZBs=
-github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514164345-adda7fe5589d/go.mod h1:d3QCEBwpiQltRUCCUsi632CuNjFdm5yP8H3r/AHDb+w=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220513145455-3fefe1c7dbe9 h1:tfmQW6q3z+Hc7y1AW8y0XmCHNbC4dOIfFH0luSKWs9w=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220513145455-3fefe1c7dbe9/go.mod h1:I+0en9YIMFEwSkY1f4wobNWeLXHwc7N6YHe5lPgZ4R0=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514154853-f93f4ab4ad34 h1:yJD8S3R1PxY1cMnXEX11G1+nEF+thMUclfpCUPdmGEw=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514154853-f93f4ab4ad34/go.mod h1:I+0en9YIMFEwSkY1f4wobNWeLXHwc7N6YHe5lPgZ4R0=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514164345-adda7fe5589d h1:fynVTSwqLUP+XA6ThSss6qYxl6QGqOdM0ghS0TN9d6c=
-github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514164345-adda7fe5589d/go.mod h1:I+0en9YIMFEwSkY1f4wobNWeLXHwc7N6YHe5lPgZ4R0=
+github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514175105-d6d6171d3ebf h1:qohpYQHfjEY0s3xMVcLoITo10Tk9vN+vutQzNdT/9cE=
+github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220514175105-d6d6171d3ebf/go.mod h1:90kxLlpUxnwoX60KTYILY0sa2I/qsipYECv4dJ8wRGQ=
+github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514175105-d6d6171d3ebf h1:+7GJMJ5T9ou4mXTbRgHsAxJbViZl+Q1csBy0VbWvylo=
+github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220514175105-d6d6171d3ebf/go.mod h1:I+0en9YIMFEwSkY1f4wobNWeLXHwc7N6YHe5lPgZ4R0=
