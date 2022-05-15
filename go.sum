@@ -1,0 +1,4 @@
+github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220515134439-d5a04ba02716 h1:36u91R5SuwnvZrVotTP5zOS3KoozlE7vf4AnHSzrdhI=
+github.com/GeorgeAPaul/Random_forest/decision_tree v0.0.0-20220515134439-d5a04ba02716/go.mod h1:90kxLlpUxnwoX60KTYILY0sa2I/qsipYECv4dJ8wRGQ=
+github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220515134439-d5a04ba02716 h1:hccTYd6i3Oy6z4qlt1N3PV7OIz1jGHdZPHtOq6PwANU=
+github.com/GeorgeAPaul/Random_forest/dt_node v0.0.0-20220515134439-d5a04ba02716/go.mod h1:I+0en9YIMFEwSkY1f4wobNWeLXHwc7N6YHe5lPgZ4R0=
