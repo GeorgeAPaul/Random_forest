@@ -14,28 +14,36 @@ import (
 
 func main() {
 	data := open_csv("test.csv")
+	//data := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	//data := open_csv("Reduced Features for TAI project.csv")
-	//fmt.Println(data)
+
+	//fmt.Println(find_best_split(data, 0))
+	//fmt.Println(find_best_split(data, 1))
+	//fmt.Println(find_best_split(data, 2))
+
+	fmt.Println(data)
 
 	root := &Node{Data: nil, Left: nil, Right: nil}
 	tree := &DecisionTree{Root: root}
 
 	populate_dt_node(data, 0, tree.Root)
 
-	rand.Seed(time.Now().UnixNano())
-	test_row := 3 //rand.Intn(len(data) - 1)
+	//rand.Seed(time.Now().UnixNano())
+	test_row := 5 //rand.Intn(len(data) - 1)
 
-	fmt.Printf("Row %v\n", test_row)
 	fmt.Printf("Classified %v\n", classify(data[test_row], tree))
 
-	fmt.Printf("%+v\n", tree)
-	fmt.Printf("%+v\n", *tree.Root)
-	fmt.Printf("%+v\n", *tree.Root.Left)
-	fmt.Printf("%+v\n", *tree.Root.Right)
-	fmt.Printf("%+v\n", *tree.Root.Left.Left)
-	fmt.Printf("%+v\n", *tree.Root.Left.Right)
-	fmt.Printf("%+v\n", *tree.Root.Right.Right)
-	fmt.Printf("%+v\n", *tree.Root.Right.Left)
+	//fmt.Printf("%+v\n", tree)
+	//fmt.Printf("%+v\n", *tree.Root)
+	//fmt.Printf("%+v\n", *tree.Root.Left)
+	//fmt.Printf("%+v\n", *tree.Root.Left.Left)
+	//fmt.Printf("%+v\n", *tree.Root.Left.Left.Left)
+	// fmt.Printf("%+v\n", *tree.Root.Left)
+	// fmt.Printf("%+v\n", *tree.Root.Right)
+	// fmt.Printf("%+v\n", *tree.Root.Left.Left)
+	// fmt.Printf("%+v\n", *tree.Root.Left.Right)
+	// fmt.Printf("%+v\n", *tree.Root.Right.Right)
+	// fmt.Printf("%+v\n", *tree.Root.Right.Left)
 
 }
 
@@ -74,17 +82,27 @@ func classify(row []float64, decision_tree *DecisionTree) int {
 
 		column := node.Data[i][0]
 		split := node.Data[i][1]
+		direction := node.Data[i][2]
 
-		if row[int(column)] > split {
+		fmt.Printf("Column %v\n", column)
+		fmt.Printf("Split %v\n", split)
+
+		if row[int(column)] > split && direction == 1 {
 			node = node.Right
 			fmt.Println("Right")
-			if node == nil {
+			if node.Left == nil {
+				return 1
+			}
+		} else if row[int(column)] < split && direction == 0 {
+			node = node.Right
+			fmt.Println("Right")
+			if node.Left == nil {
 				return 1
 			}
 		} else {
 			node = node.Left
 			fmt.Println("Left")
-			if node == nil {
+			if node.Left == nil {
 				return 0
 			}
 		}
@@ -100,7 +118,7 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 	//fmt.Println(max_depth)
 
 	//if current_depth%1 == 0 {
-	fmt.Println(current_depth)
+	//fmt.Println(current_depth)
 	//}
 
 	if current_depth == max_depth {
@@ -117,9 +135,9 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 			}
 		}
 
-		_, split := find_best_split(data, column)
+		_, split, direction := find_best_split(data, column)
 
-		node.Add_nodes(column, split)
+		node.Add_nodes(column, split, direction)
 
 		populate_dt_node(data, current_depth+1, node.Left)
 		populate_dt_node(data, current_depth+1, node.Right)
@@ -127,36 +145,45 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 	}
 }
 
-func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64) {
+func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64, best_direction int) {
 
-	sort.Slice(data, func(i, j int) bool { return data[i][column] < data[j][column] })
+	sorted_data := make([][]float64, len(data))
+
+	// https://stackoverflow.com/questions/45465368/golang-multidimensional-slice-copy
+	for i := range data {
+		sorted_data[i] = make([]float64, len(data[i]))
+		copy(sorted_data[i], data[i])
+	}
+
+	sort.Slice(sorted_data, func(i, j int) bool { return sorted_data[i][column] < sorted_data[j][column] })
 
 	lower := 0.
 	best_gini = 1
 
-	for _, row := range data {
+	for _, row := range sorted_data {
 
 		split := (lower + row[column]) / 2
 
-		gini := gini_index(data, column, split)
+		gini, direction := gini_index(sorted_data, column, split)
 
 		if gini < best_gini {
 			best_gini = gini
 			best_split = split
+			best_direction = direction
 		}
 		//fmt.Println(lower)
 		//fmt.Println(row[column])
 		//fmt.Println(gini)
-		//fmt.Println(best_gini)
+		//fmt.Println(best_split)
 
 		lower = row[column]
 
 	}
 
-	return best_gini, best_split
+	return best_gini, best_split, best_direction
 }
 
-func gini_index(data [][]float64, column int, threshold float64) (gini_index float64) {
+func gini_index(data [][]float64, column int, threshold float64) (gini_index float64, direction int) {
 
 	//var rows_above [][]float64
 	//var rows_below [][]float64
@@ -204,12 +231,24 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 		gini_below = 1 - math.Pow(below_label0/total_below, 2) - math.Pow(below_label1/total_below, 2)
 	}
 
+	ratio_above := above_label1 / total_above
+	ratio_below := below_label1 / total_below
+
+	if ratio_above > ratio_below {
+		direction = 1
+	} else if ratio_above < ratio_below {
+		direction = 0
+	} else {
+		rand.Seed(time.Now().UnixNano())
+		direction = rand.Intn(1)
+	}
+
 	//fmt.Printf("Gini Above %v\n", gini_above)
 	//fmt.Printf("Gini Below %v\n", gini_below)
 
 	average_gini := (gini_above + gini_below) / 2
 
-	return average_gini //gini
+	return average_gini, direction //gini
 }
 
 func contains(s [][]float64, e int) bool {
@@ -231,9 +270,9 @@ type Node struct {
 	Data  [][]float64
 }
 
-func (n *Node) Add_nodes(col int, split float64) {
+func (n *Node) Add_nodes(col int, split float64, direction int) {
 
-	n.Data = append(n.Data, []float64{float64(col), split})
+	n.Data = append(n.Data, []float64{float64(col), split, float64(direction)})
 
 	n.Left = &Node{Data: n.Data, Left: nil, Right: nil}
 	n.Right = &Node{Data: n.Data, Left: nil, Right: nil}
