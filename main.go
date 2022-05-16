@@ -13,6 +13,7 @@ import (
 )
 
 func main() {
+
 	data := open_csv("test.csv")
 	//data := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	//data := open_csv("Reduced Features for TAI project.csv")
@@ -29,7 +30,7 @@ func main() {
 	populate_dt_node(data, 0, tree.Root)
 
 	//rand.Seed(time.Now().UnixNano())
-	test_row := 5 //rand.Intn(len(data) - 1)
+	test_row := 2 //rand.Intn(len(data) - 1)
 
 	fmt.Printf("Classified %v\n", classify(data[test_row], tree))
 
@@ -240,7 +241,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 		direction = 0
 	} else {
 		rand.Seed(time.Now().UnixNano())
-		direction = rand.Intn(1)
+		direction = rand.Intn(2)
 	}
 
 	//fmt.Printf("Gini Above %v\n", gini_above)
