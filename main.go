@@ -30,13 +30,13 @@ func main() {
 	populate_dt_node(data, 0, tree.Root)
 
 	//rand.Seed(time.Now().UnixNano())
-	test_row := 2 //rand.Intn(len(data) - 1)
+	//test_row := 2 //rand.Intn(len(data) - 1)
 
-	fmt.Printf("Classified %v\n", classify(data[test_row], tree))
+	//fmt.Printf("Classified %v\n", classify(data[test_row], tree))
 
-	//fmt.Printf("%+v\n", tree)
-	//fmt.Printf("%+v\n", *tree.Root)
-	//fmt.Printf("%+v\n", *tree.Root.Left)
+	fmt.Printf("%+v\n", tree)
+	fmt.Printf("%+v\n", *tree.Root)
+	fmt.Printf("%+v\n", *tree.Root.Left)
 	//fmt.Printf("%+v\n", *tree.Root.Left.Left)
 	//fmt.Printf("%+v\n", *tree.Root.Left.Left.Left)
 	// fmt.Printf("%+v\n", *tree.Root.Left)
@@ -136,17 +136,22 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 			}
 		}
 
-		_, split, direction := find_best_split(data, column)
+		_, split, direction, rows_above, rows_below := find_best_split(data, column)
+
+		if len(rows_above) == 0 || len(rows_below) == 0 {
+			fmt.Println("HEY")
+			return
+		}
 
 		node.Add_nodes(column, split, direction)
 
-		populate_dt_node(data, current_depth+1, node.Left)
-		populate_dt_node(data, current_depth+1, node.Right)
+		populate_dt_node(rows_below, current_depth+1, node.Left)
+		populate_dt_node(rows_above, current_depth+1, node.Right)
 
 	}
 }
 
-func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64, best_direction int) {
+func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64, best_direction int, best_rows_above [][]float64, best_rows_below [][]float64) {
 
 	sorted_data := make([][]float64, len(data))
 
@@ -165,12 +170,14 @@ func find_best_split(data [][]float64, column int) (best_gini float64, best_spli
 
 		split := (lower + row[column]) / 2
 
-		gini, direction := gini_index(sorted_data, column, split)
+		gini, direction, rows_above, rows_below := gini_impurity(sorted_data, column, split)
 
 		if gini < best_gini {
 			best_gini = gini
 			best_split = split
 			best_direction = direction
+			best_rows_above = rows_above
+			best_rows_below = rows_below
 		}
 		//fmt.Println(lower)
 		//fmt.Println(row[column])
@@ -181,10 +188,10 @@ func find_best_split(data [][]float64, column int) (best_gini float64, best_spli
 
 	}
 
-	return best_gini, best_split, best_direction
+	return best_gini, best_split, best_direction, best_rows_above, best_rows_below
 }
 
-func gini_index(data [][]float64, column int, threshold float64) (gini_index float64, direction int) {
+func gini_impurity(data [][]float64, column int, threshold float64) (gini_index float64, direction int, rows_above [][]float64, rows_below [][]float64) {
 
 	//var rows_above [][]float64
 	//var rows_below [][]float64
@@ -197,7 +204,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 	for _, row := range data {
 
 		if row[column] < threshold {
-			//rows_below = append(rows_below, row)
+			rows_below = append(rows_below, row)
 
 			if row[len(row)-1] == 0 {
 				below_label0++
@@ -205,7 +212,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 				below_label1++
 			}
 		} else {
-			//rows_above = append(rows_above, row)
+			rows_above = append(rows_above, row)
 
 			if row[len(row)-1] == 0 {
 				above_label0++
@@ -215,8 +222,8 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 		}
 	}
 
-	total_above := above_label0 + above_label1
-	total_below := below_label0 + below_label1
+	total_above := float64(len(rows_above))
+	total_below := float64(len(rows_below))
 
 	//fmt.Printf("Above %v\n", rows_above)
 	//fmt.Printf("Below %v\n", rows_below)
@@ -249,7 +256,7 @@ func gini_index(data [][]float64, column int, threshold float64) (gini_index flo
 
 	average_gini := (gini_above + gini_below) / 2
 
-	return average_gini, direction //gini
+	return average_gini, direction, rows_above, rows_below //gini
 }
 
 func contains(s [][]float64, e int) bool {
