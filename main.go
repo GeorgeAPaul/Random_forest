@@ -27,16 +27,18 @@ func main() {
 	root := &Node{Data: nil, Left: nil, Right: nil}
 	tree := &DecisionTree{Root: root}
 
-	populate_dt_node(data, 0, tree.Root)
+	training_data := data[:5]
+
+	populate_dt_node(training_data, 0, tree.Root)
 
 	//rand.Seed(time.Now().UnixNano())
-	//test_row := 2 //rand.Intn(len(data) - 1)
+	test_row := 8 //rand.Intn(len(data) - 1)
 
-	//fmt.Printf("Classified %v\n", classify(data[test_row], tree))
+	fmt.Printf("Classified %v\n", classify(data[test_row], tree))
 
-	fmt.Printf("%+v\n", tree)
-	fmt.Printf("%+v\n", *tree.Root)
-	fmt.Printf("%+v\n", *tree.Root.Left)
+	//fmt.Printf("%+v\n", tree)
+	//fmt.Printf("%+v\n", *tree.Root)
+	//fmt.Printf("%+v\n", *tree.Root.Left)
 	//fmt.Printf("%+v\n", *tree.Root.Left.Left)
 	//fmt.Printf("%+v\n", *tree.Root.Left.Left.Left)
 	// fmt.Printf("%+v\n", *tree.Root.Left)
@@ -74,8 +76,6 @@ func open_csv(path string) (data [][]float64) {
 }
 
 func classify(row []float64, decision_tree *DecisionTree) int {
-
-	fmt.Printf("Row %v\n", row)
 
 	node := decision_tree.Root
 
@@ -138,8 +138,11 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 
 		_, split, direction, rows_above, rows_below := find_best_split(data, column)
 
+		//fmt.Printf("Above %v\n", rows_above)
+		//fmt.Printf("Below %v\n", rows_below)
+
 		if len(rows_above) == 0 || len(rows_below) == 0 {
-			fmt.Println("HEY")
+			//fmt.Println("HEY")
 			return
 		}
 
