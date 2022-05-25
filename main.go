@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"math/rand"
 	"os"
@@ -14,43 +15,28 @@ import (
 
 func main() {
 
-	data := open_csv("test.csv")
+	//data := open_csv("test.csv")
 	//data := open_csv("Reduced Features for TAI project.csv")
+	data := open_csv("Raisin_Dataset.csv")
 
-	training_data := data[:5]
+	training_data := data[100:801]
 
-	fmt.Println(data)
-	fmt.Println(training_data)
+	forest := plant_forest(training_data, 100)
 
-	forest := plant_forest(data, 10)
+	//fmt.Printf("Classified %v\n", classify_forest(data[33], forest))
 
-	test_row := 6
+	f, _ := os.Create("data.txt")
+	defer f.Close()
 
-	fmt.Printf("Classified %v\n", classify_forest(data[test_row], forest))
-
-	//fmt.Printf("Forest %v\n", *forest)
-
-	//root := &Node{Data: nil, Left: nil, Right: nil}
-	//tree := &DecisionTree{Root: root}
-
-	//populate_dt_node(training_data, 0, tree.Root)
-
-	//rand.Seed(time.Now().UnixNano())
-	//test_row := 8 //rand.Intn(len(data) - 1)
-
-	//fmt.Printf("Classified %v\n", classify(data[test_row], tree))
-
-	//fmt.Printf("%+v\n", tree)
-	//fmt.Printf("%+v\n", *tree.Root)
-	//fmt.Printf("%+v\n", *tree.Root.Left)
-	//fmt.Printf("%+v\n", *tree.Root.Left.Left)
-	//fmt.Printf("%+v\n", *tree.Root.Left.Left.Left)
-	// fmt.Printf("%+v\n", *tree.Root.Left)
-	// fmt.Printf("%+v\n", *tree.Root.Right)
-	// fmt.Printf("%+v\n", *tree.Root.Left.Left)
-	// fmt.Printf("%+v\n", *tree.Root.Left.Right)
-	// fmt.Printf("%+v\n", *tree.Root.Right.Right)
-	// fmt.Printf("%+v\n", *tree.Root.Right.Left)
+	for i := 0; i < len(data); i++ {
+		if i <= 100 || i > 800 {
+			class := classify_forest(data[i], forest)
+			_, err := f.WriteString(strconv.Itoa(class) + "\n")
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
 
 }
 
@@ -87,6 +73,7 @@ func plant_forest(data [][]float64, ntrees int) (forest []*DecisionTree) {
 		forest = append(forest, tree)
 
 		populate_dt_node(data, 0, tree.Root)
+		fmt.Printf("Tree done %v\n", i)
 	}
 
 	return forest
@@ -109,8 +96,8 @@ func classify_forest(row []float64, forest []*DecisionTree) int {
 		}
 	}
 
-	fmt.Printf("yay: %v\n", yay)
-	fmt.Printf("nay: %v\n", nay)
+	//fmt.Printf("yay: %v\n", yay)
+	//fmt.Printf("nay: %v\n", nay)
 	if yay > nay {
 		return 1
 	}
@@ -159,30 +146,33 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 
 	max_depth := len(data[0]) - 1
 
-	//fmt.Println(max_depth)
-
-	//if current_depth%1 == 0 {
-	//fmt.Println(current_depth)
-	//}
-
 	if current_depth == max_depth {
 		return
 	} else {
 
 		var column int
-
-		for {
-			rand.Seed(time.Now().UnixNano())
-			column = rand.Intn(len(data[0]) - 1)
-			if !contains(node.Data, column) {
-				break
+		mtry := 3
+		for i := 0; i < mtry; i ++ {
+			for {
+				rand.Seed(time.Now().UnixNano())
+				column = rand.Intn(len(data[0]) - 1)				
+				if !contains(node.Data, column) {
+					break
+				}
 			}
+
+			_, split, direction, rows_above, rows_below := find_best_split(data, column)
+
+			if split < best_split {
+				best_gini = gini
+				best_split = split
+				best_direction = direction
+				best_rows_above = rows_above
+				best_rows_below = rows_below
+			}
+
 		}
-
-		_, split, direction, rows_above, rows_below := find_best_split(data, column)
-
-		//fmt.Printf("Above %v\n", rows_above)
-		//fmt.Printf("Below %v\n", rows_below)
+	}
 
 		if len(rows_above) == 0 || len(rows_below) == 0 {
 			return
@@ -216,6 +206,8 @@ func find_best_split(data [][]float64, column int) (best_gini float64, best_spli
 		split := (lower + row[column]) / 2
 
 		gini, direction, rows_above, rows_below := gini_impurity(sorted_data, column, split)
+
+		//fmt.Println(gini, split, direction)
 
 		if gini < best_gini {
 			best_gini = gini
@@ -262,6 +254,7 @@ func gini_impurity(data [][]float64, column int, threshold float64) (gini_index 
 
 	total_above := float64(len(rows_above))
 	total_below := float64(len(rows_below))
+	total := float64(len(data))
 
 	//fmt.Printf("Above %v\n", rows_above)
 	//fmt.Printf("Below %v\n", rows_below)
@@ -289,9 +282,9 @@ func gini_impurity(data [][]float64, column int, threshold float64) (gini_index 
 		direction = rand.Intn(2)
 	}
 
-	average_gini := (gini_above + gini_below) / 2
+	weighted_gini := (total_above/total)*gini_above + (total_below/total)*gini_below
 
-	return average_gini, direction, rows_above, rows_below
+	return weighted_gini, direction, rows_above, rows_below
 }
 
 func contains(s [][]float64, e int) bool {
