@@ -16,6 +16,7 @@ import (
 func main() {
 
 	//data := open_csv("test.csv")
+	//training_data := data[:10]
 	//data := open_csv("Reduced Features for TAI project.csv")
 	data := open_csv("Raisin_Dataset.csv")
 
@@ -25,13 +26,26 @@ func main() {
 
 	//fmt.Printf("Classified %v\n", classify_forest(data[33], forest))
 
-	f, _ := os.Create("data.txt")
+	f, _ := os.Create("prediction.txt")
 	defer f.Close()
 
 	for i := 0; i < len(data); i++ {
 		if i <= 100 || i > 800 {
 			class := classify_forest(data[i], forest)
 			_, err := f.WriteString(strconv.Itoa(class) + "\n")
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+
+	f1, _ := os.Create("random.txt")
+	defer f1.Close()
+
+	for i := 0; i < len(data); i++ {
+		if i <= 100 || i > 800 {
+			//rand.Seed(time.Now().UnixNano())
+			_, err := f1.WriteString(strconv.Itoa(rand.Intn(2)) + "\n")
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -67,7 +81,7 @@ func open_csv(path string) (data [][]float64) {
 
 func plant_forest(data [][]float64, ntrees int) (forest []*DecisionTree) {
 
-	for i := 0; i <= ntrees; i++ {
+	for i := 0; i < ntrees; i++ {
 		root := &Node{Data: nil, Left: nil, Right: nil}
 		tree := &DecisionTree{Root: root}
 		forest = append(forest, tree)
@@ -118,22 +132,20 @@ func classify_tree(row []float64, decision_tree *DecisionTree) int {
 		//fmt.Printf("Column %v\n", column)
 		//fmt.Printf("Split %v\n", split)
 
-		if row[int(column)] > split && direction == 1 {
+		if row[int(column)] > split {
 			node = node.Right
 			//fmt.Println("Right")
-			if node.Left == nil {
+			if node.Left == nil && direction == 1 {
 				return 1
+			} else if node.Left == nil && direction == 0 {
+				return 0
 			}
-		} else if row[int(column)] < split && direction == 0 {
-			node = node.Right
-			//fmt.Println("Right")
-			if node.Left == nil {
-				return 1
-			}
-		} else {
+		} else if row[int(column)] < split {
 			node = node.Left
-			//fmt.Println("Left")
-			if node.Left == nil {
+			//fmt.Println("Right")
+			if node.Left == nil && direction == 0 {
+				return 1
+			} else if node.Left == nil && direction == 1 {
 				return 0
 			}
 		}
@@ -146,24 +158,39 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 
 	max_depth := len(data[0]) - 1
 
+	var column int
+	mtry := 3
+
+	var best_column int
+	best_gini := 1.
+	var best_split float64
+	var best_direction int
+	var best_rows_above [][]float64
+	var best_rows_below [][]float64
+
 	if current_depth == max_depth {
 		return
 	} else {
 
-		var column int
-		mtry := 3
-		for i := 0; i < mtry; i ++ {
+		for i := 0; i < mtry; i++ {
+
 			for {
 				rand.Seed(time.Now().UnixNano())
-				column = rand.Intn(len(data[0]) - 1)				
+				column = rand.Intn(len(data[0]) - 1)
 				if !contains(node.Data, column) {
 					break
 				}
 			}
 
-			_, split, direction, rows_above, rows_below := find_best_split(data, column)
+			gini, split, direction, rows_above, rows_below := find_best_split(data, column)
 
-			if split < best_split {
+			if gini < best_gini {
+				//fmt.Printf("Tries %v\n", i)
+				//fmt.Printf("Gini %v\n", gini)
+				//fmt.Printf("Column %v\n", split)
+				//fmt.Printf("Direction %v\n", direction)
+
+				best_column = column
 				best_gini = gini
 				best_split = split
 				best_direction = direction
@@ -174,16 +201,15 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 		}
 	}
 
-		if len(rows_above) == 0 || len(rows_below) == 0 {
-			return
-		}
-
-		node.Add_nodes(column, split, direction)
-
-		populate_dt_node(rows_below, current_depth+1, node.Left)
-		populate_dt_node(rows_above, current_depth+1, node.Right)
-
+	if len(best_rows_above) == 0 || len(best_rows_below) == 0 {
+		return
 	}
+
+	node.Add_nodes(best_column, best_split, best_direction)
+
+	populate_dt_node(best_rows_below, current_depth+1, node.Left)
+	populate_dt_node(best_rows_above, current_depth+1, node.Right)
+
 }
 
 func find_best_split(data [][]float64, column int) (best_gini float64, best_split float64, best_direction int, best_rows_above [][]float64, best_rows_below [][]float64) {
