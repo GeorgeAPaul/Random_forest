@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
 	"log"
 	"math"
@@ -15,6 +14,7 @@ import (
 
 func main() {
 
+	rand.Seed(time.Now().UnixNano())
 	//data := open_csv("test.csv")
 	//training_data := data[:10]
 	//data := open_csv("Reduced Features for TAI project.csv")
@@ -22,9 +22,7 @@ func main() {
 
 	training_data := data[100:801]
 
-	forest := plant_forest(training_data, 100)
-
-	//fmt.Printf("Classified %v\n", classify_forest(data[33], forest))
+	forest := plant_forest(training_data, 100, 3)
 
 	f, _ := os.Create("prediction.txt")
 	defer f.Close()
@@ -79,15 +77,30 @@ func open_csv(path string) (data [][]float64) {
 	return data
 }
 
-func plant_forest(data [][]float64, ntrees int) (forest []*DecisionTree) {
+func plant_forest(data [][]float64, ntrees int, mtry int) (forest []*DecisionTree) {
 
 	for i := 0; i < ntrees; i++ {
+
+		bagging_size := len(data) / ntrees
+		var bag [][]float64
+
+		for j := 0; j < bagging_size; j++ {
+			bag = append(bag, data[rand.Intn(700)])
+
+		}
+
+		//fmt.Printf("Bag: %v\n", i)
+		//fmt.Println(bag)
+
 		root := &Node{Data: nil, Left: nil, Right: nil}
 		tree := &DecisionTree{Root: root}
 		forest = append(forest, tree)
 
-		populate_dt_node(data, 0, tree.Root)
-		fmt.Printf("Tree done %v\n", i)
+		populate_dt_node(bag, 0, tree.Root, mtry)
+
+		//fmt.Printf("Tree: %v\n", tree.Root.Data)
+
+		//fmt.Printf("Tree done %v\n", i)
 	}
 
 	return forest
@@ -95,12 +108,16 @@ func plant_forest(data [][]float64, ntrees int) (forest []*DecisionTree) {
 
 func classify_forest(row []float64, forest []*DecisionTree) int {
 
-	//votes := make([]int, len(forest))
 	var yay int
 	var nay int
 
 	for i := 0; i < len(forest); i++ {
-		//votes[i] = classify_tree(row, forest[i])
+
+		//fmt.Printf("Tree: %v\n", i)
+		//fmt.Printf("Tree data: %v\n", forest[i].Root.Data)
+		//fmt.Printf("Tree Left: %v\n", forest[i].Root.Left)
+		//fmt.Printf("Tree Right: %v\n", forest[i].Root.Right)
+
 		result := classify_tree(row, forest[i])
 
 		if result == 1 {
@@ -154,12 +171,11 @@ func classify_tree(row []float64, decision_tree *DecisionTree) int {
 	return 99
 }
 
-func populate_dt_node(data [][]float64, current_depth int, node *Node) {
+func populate_dt_node(data [][]float64, current_depth int, node *Node, mtry int) {
 
 	max_depth := len(data[0]) - 1
 
 	var column int
-	mtry := 3
 
 	var best_column int
 	best_gini := 1.
@@ -175,7 +191,7 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 		for i := 0; i < mtry; i++ {
 
 			for {
-				rand.Seed(time.Now().UnixNano())
+				//rand.Seed(time.Now().UnixNano())
 				column = rand.Intn(len(data[0]) - 1)
 				if !contains(node.Data, column) {
 					break
@@ -201,14 +217,16 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node) {
 		}
 	}
 
+	//node.Add_data(best_column, best_split, best_direction)
+
+	node.Add_nodes(best_column, best_split, best_direction)
+
 	if len(best_rows_above) == 0 || len(best_rows_below) == 0 {
 		return
 	}
 
-	node.Add_nodes(best_column, best_split, best_direction)
-
-	populate_dt_node(best_rows_below, current_depth+1, node.Left)
-	populate_dt_node(best_rows_above, current_depth+1, node.Right)
+	populate_dt_node(best_rows_below, current_depth+1, node.Left, mtry)
+	populate_dt_node(best_rows_above, current_depth+1, node.Right, mtry)
 
 }
 
@@ -304,7 +322,7 @@ func gini_impurity(data [][]float64, column int, threshold float64) (gini_index 
 	} else if ratio_above < ratio_below {
 		direction = 0
 	} else {
-		rand.Seed(time.Now().UnixNano())
+		//rand.Seed(time.Now().UnixNano())
 		direction = rand.Intn(2)
 	}
 
@@ -330,6 +348,10 @@ type Node struct {
 	Left  *Node
 	Right *Node
 	Data  [][]float64
+}
+
+func (n *Node) Add_data(col int, split float64, direction int) {
+
 }
 
 func (n *Node) Add_nodes(col int, split float64, direction int) {
