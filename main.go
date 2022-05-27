@@ -37,9 +37,10 @@ func main() {
 
 	for i := 0; i < reps; i++ {
 		correct := 0.
-		forest := plant_forest(training_data, 100, 6)
+		forest := plant_forest(training_data, 1000, 1)
 		for j := 0; j < len(data); j++ {
 			if j < 100 || j >= 800 {
+				//fmt.Println(data[j])
 				class := classify_forest(data[j], forest)
 				if class == int(data[j][len(data[j])-1]) {
 					correct++
@@ -99,7 +100,7 @@ func open_csv(path string) (data [][]float64) {
 
 func plant_forest(data [][]float64, ntrees int, mtry int) (forest []*DecisionTree) {
 
-	for i := 0; i <= ntrees; i++ {
+	for i := 0; i < ntrees; i++ {
 
 		//bagging_size := len(data)
 		var bag [][]float64
@@ -118,9 +119,11 @@ func plant_forest(data [][]float64, ntrees int, mtry int) (forest []*DecisionTre
 
 		populate_dt_node(bag, 0, tree.Root, mtry)
 
-		//fmt.Printf("Tree: %v\n", tree.Root.Data)
-		//fmt.Printf("TreeLeft: %v\n", tree.Root.Left.Data)
-		//fmt.Printf("TreeRight: %v\n", tree.Root.Right.Data)
+		//fmt.Printf("Tree: %v\n", tree.Root)
+		//fmt.Printf("TreeLeft: %v\n", tree.Root.Left)
+		//fmt.Printf("TreeRight: %v\n", tree.Root.Right)
+		//fmt.Printf("TreeLeftLeft: %v\n", tree.Root.Left)
+		//fmt.Printf("TreeLeftRight: %v\n", tree.Root.Right)
 
 		fmt.Printf("Tree done %v\n", i)
 	}
@@ -149,8 +152,8 @@ func classify_forest(row []float64, forest []*DecisionTree) int {
 		}
 	}
 
-	fmt.Printf("yay: %v\n", yay)
-	fmt.Printf("nay: %v\n", nay)
+	//fmt.Printf("yay: %v\n", yay)
+	//fmt.Printf("nay: %v\n", nay)
 	if yay > nay {
 		return 1
 	}
@@ -173,6 +176,9 @@ func classify_tree(row []float64, decision_tree *DecisionTree) int {
 		//fmt.Printf("Column %v\n", column)
 		//fmt.Printf("Split %v\n", split)
 
+		//fmt.Println(node)
+		//fmt.Println(node.Left)
+		//fmt.Println(node.Right)
 		if row[int(column)] >= split {
 			node = node.Right
 			//fmt.Println("Right")
@@ -183,7 +189,7 @@ func classify_tree(row []float64, decision_tree *DecisionTree) int {
 			}
 		} else if row[int(column)] < split {
 			node = node.Left
-			//fmt.Println("Right")
+			//fmt.Println("Left")
 			if node == nil && direction == 0 {
 				return 1
 			} else if node == nil && direction == 1 {
@@ -199,7 +205,7 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node, mtry int)
 
 	//fmt.Println("Adding node")
 
-	max_depth := len(data[0]) - 1
+	max_depth := 3
 
 	var column int
 
@@ -223,10 +229,6 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node, mtry int)
 		gini, split, direction, rows_above, rows_below := find_best_split(data, column)
 
 		if gini < best_gini {
-			//fmt.Printf("Tries %v\n", i)
-			//fmt.Printf("Gini %v\n", gini)
-			//fmt.Printf("Column %v\n", split)
-			//fmt.Printf("Direction %v\n", direction)
 
 			best_column = column
 			best_gini = gini
@@ -250,6 +252,9 @@ func populate_dt_node(data [][]float64, current_depth int, node *Node, mtry int)
 	}
 
 	node.Add_nodes(best_column, best_split, best_direction)
+
+	//fmt.Printf("Below: %v\n", best_rows_below)
+	//fmt.Printf("Above: %v\n", best_rows_above)
 
 	populate_dt_node(best_rows_below, current_depth+1, node.Left, mtry)
 	populate_dt_node(best_rows_above, current_depth+1, node.Right, mtry)
