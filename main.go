@@ -15,36 +15,55 @@ import (
 
 func main() {
 
+	//TUNABLE PARAMETERES IN CAPS
+
+	//Seed for randomness
 	rand.Seed(time.Now().UnixNano())
 
-	//data := open_csv("test.csv")
-	data := open_csv("heart_failure_clinical_records_dataset.csv")
+	//CHOOSE YOUR DATA
+	//data := open_csv("heart_failure_clinical_records_dataset.csv")
 	//data := open_csv("Algerian_forest_fires_dataset_UPDATE.csv")
 	//data := open_csv("SouthGermanCredit.csv")
-	//data := open_csv("Raisin_Dataset.csv")
+	data := open_csv("Raisin_Dataset.csv")
 	//data := open_csv("test.csv")
-	training_data := data[100:120]
 
+	//Which rows to use as training data?
+	begin_train := 100
+	end_train := 800
+
+	training_data := data[begin_train:end_train]
+
+	//Write predictions to file
 	f, _ := os.Create("prediction.txt")
 	defer f.Close()
 
 	average_correct := 0.
+
+	//HOW MANY FORESTS TO CREATE
 	reps := 10
 
 	for i := 0; i < reps; i++ {
 		total := 0.
 		correct := 0.
-		forest := plant_forest(training_data, 100, 3, 3)
+
+		//FOREST ARGUMENTS plant_forest(number of trees, max tree depth, features to randomly sample)
+		//Build forest
+		forest := plant_forest(training_data, 50, 3, 3)
 		for j := 0; j < len(data); j++ {
-			if j < 100 || j > 120 {
-				//fmt.Printf("Validation data row %v\n", j)
+
+			//Exclude training data
+			if j < begin_train || j > end_train {
 				class := classify_forest(data[j], forest)
+
+				//Check if correct
 				if class == int(data[j][len(data[j])-1]) {
 					correct++
 					//fmt.Println("Correct!")
 				} else {
 					//fmt.Println("Not correct...")
 				}
+
+				//Write to file
 				_, err := f.WriteString(strconv.Itoa(class) + "\n")
 				if err != nil {
 					log.Fatal(err)
@@ -53,20 +72,23 @@ func main() {
 				total++
 			}
 		}
+
+		//Prints correct predictions for each forest as percentage
 		fmt.Printf("Correct: %v%%\n", correct/total*100)
-		//fmt.Printf("Total: %v\n", total)
 		average_correct += correct / total * 100
 	}
 
+	//Prints average correct predictions for all the forests
 	average_correct = average_correct / float64(reps)
 
 	fmt.Printf("Average correct: %v%%\n", average_correct)
 
+	//All below was used to generate random predictions
 	f1, _ := os.Create("random.txt")
 	defer f1.Close()
 
 	for i := 0; i < len(data); i++ {
-		if i <= 100 || i > 800 {
+		if i <= begin_train || i > end_train {
 			_, err := f1.WriteString(strconv.Itoa(rand.Intn(2)) + "\n")
 			if err != nil {
 				log.Fatal(err)
